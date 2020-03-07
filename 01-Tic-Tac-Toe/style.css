@@ -1,0 +1,72 @@
+/* || SIMPLE RESET */
+
+* {
+	margin: 0;
+	padding: 0;
+}
+
+/* || RESET BOX-SIZING TO BORDER-BOX */
+
+html {
+  box-sizing: border-box;
+}
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+/* || GENERAL STYLES */
+
+html {
+  font-size: 10px;
+  color: dar
+}
+
+:root {
+  --base-color: rgba(56, 56, 61, 1);
+  --secondary-color: rgba(255, 165, 0, 0.7);
+}
+
+body {
+  background-color: var(--base-color);
+}
+
+.title {
+  margin: 100px auto;
+  max-width: 350px;
+  text-align: center;
+  font-size: 5.4rem;
+  color: var(--secondary-color);
+  text-shadow: 10px 10px 20px rgba(0,0,0,1);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+}
+
+.wrapper {
+  margin: 100px auto;
+  max-width: 350px;
+}
+
+.board {
+  max-width: 350px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  grid-auto-rows: minmax(100px, auto);
+  color: var(--base-color);
+  
+}
+
+.board__field {
+  background-color: var(--secondary-color);
+  border: none;
+  box-shadow: 10px 10px 20px 5px rgba(0,0,0,0.7);
+  font-size: 5rem;
+  transition: all 0.7s ease;
+  scale: 0.9;
+}
+
+.board__field--unchecked:focus,
+.board__field--unchecked:hover {
+  scale: 1;
+  box-shadow: 15px 15px 25px 7px rgba(0,0,0,0.7);
+}
