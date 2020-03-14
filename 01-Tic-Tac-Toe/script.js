@@ -1,13 +1,4 @@
-// Global variables
-const x = 'X';
-const y = 'O';
-const playerOneMoves = [];
-const playerTwoMoves = [];
-
-// Catch DOM elements
 const boardFields = document.querySelectorAll('.board__field');
-
-// Create the list of moves
 
 const winningMoves = [[0, 1, 2], 
                       [3, 4, 5], 
@@ -18,45 +9,65 @@ const winningMoves = [[0, 1, 2],
                       [0, 4, 8], 
                       [2, 4, 6]];
 
-// Ascertain who is the winner
-function checkIfWin() {
-  if (playerOneMoves.length >= 3) {
+const Player = function(human, mark, playerMoves = []) {
+  this.human = human;
+  this.mark = mark;
+  this.playerMoves = playerMoves;
+};
 
-    winningMoves.forEach(movesSequence => {
-      let i = 0;
+Player.prototype.makeMove = function(e) {
+  if (e.target.classList.contains('board__field--unchecked')) {
+    e.target.textContent = players[0].mark;
+    e.target.style.setProperty('scale', '1');
+    e.target.classList.remove('board__field--unchecked');
 
-      movesSequence.forEach(move => {
-        if (playerOneMoves.includes(move)) {
-          i++;
-        }
+    players[0].playerMoves.push(Number(this.getAttribute('data-number')));
+    players[0].playerMoves.sort();
+    
+    if (players[0].playerMoves.length >= 3) {
+      players[0].checkIfWin();
+    };
 
-      });
-
-      if (i === 3) {
-        window.alert('Wygrałeś!');
-      };
-
-    });
+    players.reverse();
   };
 };
 
-// Allow to choose X or O
-  // if O - computer is doing the first move
-  // else - human
+Player.prototype.checkIfWin = function() {
+  winningMoves.forEach(movesSequence => {
+    let i = 0;
+    movesSequence.forEach(move => {
+      if (this.playerMoves.includes(move)) {
+        i++;
+      }
+    });
 
-// Moves
-function makeMove(e) {
-  if (e.target.classList.contains('board__field--unchecked')) {
-
-    this.textContent=player1;
-    this.style.setProperty('scale', '1');
-    this.classList.remove('board__field--unchecked');
-
-    playerOneMoves.push(Number(this.getAttribute('data-number')));
-    playerOneMoves.sort();
-  }
-  checkIfWin();
+    if (i === 3) {
+      window.alert(`${this.mark} is the winner!`);
+    };
+  });
 };
 
-// Event listeners
-boardFields.forEach(field => field.addEventListener('click', makeMove));
+function checkIfDraw() {
+  let markedFields = boardFields.length;
+
+  for (let i = 1; i < boardFields.length; i++) {
+    if (!(boardFields[i].classList.contains('board__field--unchecked'))) {
+      markedFields--;
+    }
+  };
+
+  if (markedFields === 1) {
+    window.alert(`It's a draw!`);
+  };
+};
+
+const x = 'X';
+const y = 'O';
+
+const player1 = new Player(true, x);
+const player2 = new Player(true, y);
+
+const players = [player1, player2];
+
+boardFields.forEach(field => field.addEventListener('click', players[0].makeMove));
+boardFields.forEach(field => field.addEventListener('click', checkIfDraw));
