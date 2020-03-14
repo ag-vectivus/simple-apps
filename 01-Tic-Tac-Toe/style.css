@@ -18,7 +18,6 @@ html {
 
 html {
   font-size: 10px;
-  color: dar
 }
 
 :root {
@@ -53,7 +52,6 @@ body {
   gap: 5px;
   grid-auto-rows: minmax(100px, auto);
   color: var(--base-color);
-  
 }
 
 .board__field {
