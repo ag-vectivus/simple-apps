@@ -43,7 +43,9 @@ Player.prototype.checkIfWin = function() {
 
     if (i === 3) {
       endGame();
-      window.alert(`${this.mark} is the winner!`);
+      if (window.confirm(`${this.mark} is the winner! \nDo you want to play again?`)) {
+        window.location.reload();
+      };
     };
   });
 };
@@ -59,7 +61,9 @@ function checkIfDraw() {
 
   if (markedFields === 1) {
     endGame();
-    window.alert(`It's a draw!`);
+    if (window.confirm(`It's a draw! \nDo you want to play again?`)) {
+      window.location.reload();
+    };
   };
 };
 
@@ -67,6 +71,11 @@ function endGame() {
   boardFields.forEach(field => field.removeEventListener('click', players[0].makeMove));
   boardFields.forEach(field => field.removeEventListener('click', checkIfDraw));
   boardFields.forEach(field => field.classList.remove('board__field--unchecked'));
+};
+
+function game() {
+  boardFields.forEach(field => field.addEventListener('click', players[0].makeMove));
+  boardFields.forEach(field => field.addEventListener('click', checkIfDraw));
 };
 
 const x = 'X';
@@ -77,5 +86,4 @@ const player2 = new Player(true, y);
 
 const players = [player1, player2];
 
-boardFields.forEach(field => field.addEventListener('click', players[0].makeMove));
-boardFields.forEach(field => field.addEventListener('click', checkIfDraw));
+game();
