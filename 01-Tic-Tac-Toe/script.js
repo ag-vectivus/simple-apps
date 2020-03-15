@@ -42,6 +42,7 @@ Player.prototype.checkIfWin = function() {
     });
 
     if (i === 3) {
+      endGame();
       window.alert(`${this.mark} is the winner!`);
     };
   });
@@ -57,8 +58,15 @@ function checkIfDraw() {
   };
 
   if (markedFields === 1) {
+    endGame();
     window.alert(`It's a draw!`);
   };
+};
+
+function endGame() {
+  boardFields.forEach(field => field.removeEventListener('click', players[0].makeMove));
+  boardFields.forEach(field => field.removeEventListener('click', checkIfDraw));
+  boardFields.forEach(field => field.classList.remove('board__field--unchecked'));
 };
 
 const x = 'X';
