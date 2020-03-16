@@ -16,6 +16,7 @@ const Player = function(human, mark, playerMoves = []) {
 };
 
 Player.prototype.makeMove = function(e) {
+
   if (e.target.classList.contains('board__field--unchecked')) {
     e.target.textContent = players[0].mark;
     e.target.style.setProperty('scale', '1');
@@ -34,9 +35,11 @@ Player.prototype.makeMove = function(e) {
 };
 
 Player.prototype.checkIfWin = function() {
+
   winningMoves.forEach(movesSequence => {
     let i = 0;
     movesSequence.forEach(move => {
+
       if (this.playerMoves.includes(move)) {
         i++;
       }
@@ -44,6 +47,7 @@ Player.prototype.checkIfWin = function() {
 
     if (i === 3) {
       endGame();
+
       if (window.confirm(`${this.mark} is the winner! \nDo you want to play again?`)) {
         window.location.reload();
       };
@@ -52,19 +56,44 @@ Player.prototype.checkIfWin = function() {
 };
 
 Player.prototype.computerMove = function() {
-  const bestMoves = [4, 0, 2, 6, 8, 1, 3, 5, 7];
 
-  // possible moves (must contain available field)
-  // check how many fields from winning lists has the computer (playerMoves)
-  // sort them by current length (but it must contain free field)
-  // if true - make move on list with biggest number of computerMoves
-  
-  // possible human moves (must contain available field)
-  // check how many fields from winning lists has human (playerMoves)
-  // sort them by current length (but it must contain free field)
-  // if true - make move on list with biggest number of computermoves - don't allow to win
+  const bestMoves = [4, 0, 2, 6, 8, 1, 3, 5, 7];
+  const availableMoves = findAvailableMoves();
+  const leftWinningMoves = []
 
   if (this.human === false) {
+    
+    winningMoves.forEach(movesSequence => {
+
+      let i = 0;
+      for (let possibleMove of movesSequence) {
+        for (let availableMove of availableMoves) {
+          if (possibleMove === availableMove) {
+            i++;
+          }
+        }
+      }
+
+      if (i > 0) {
+        leftWinningMoves.push([i, movesSequence]);      
+      };
+    });
+
+    leftWinningMoves.sort()
+    console.log(leftWinningMoves);
+  };
+
+  if (this.human === false) {
+    // get player(computer) moves - this will go as second move
+    // compare with leftWinningMoves:
+      // if movesSequence of leftWinningMoves doesn't contain any enemy move fulfill it
+  };
+
+  // get human moves - this will go as first move
+  // compare with leftWinningMoves
+    // if the first element of movesSequence of leftWinningMoves === 1 and it contains 2 enemy moves - fulfill the last one to not allow opponent to win
+
+  if (this.human === false) { // this will go as the last option
     let guard = 0;
     bestMoves.forEach(move => {
       if (boardFields[move].classList.contains('board__field--unchecked') && guard === 0) {
@@ -98,6 +127,16 @@ function computerMoveDelay(min, max) {
   return Math.floor(Math.random() * (max - min) + min) * 1000;
 }
 
+function findAvailableMoves() {
+  const availableMoves = [];
+  boardFields.forEach(field => {
+    if (field.classList.contains('board__field--unchecked')) {
+      const fieldIndex = Number(field.getAttribute('data-number'))
+      availableMoves.push(fieldIndex);
+    }});
+  return availableMoves;
+};
+
 function endGame() {
   boardFields.forEach(field => field.removeEventListener('click', players[0].makeMove));
   boardFields.forEach(field => field.removeEventListener('click', checkIfDraw));
@@ -119,7 +158,7 @@ const players = [player1, player2];
 
 game();
 
-// add computer as a player - done
+// add computer as a player
 // add an option to write a name of the player
 // add an option to keep and display scores
 // add an animation when sb wins
