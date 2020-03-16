@@ -29,6 +29,7 @@ Player.prototype.makeMove = function(e) {
     };
 
     players.reverse();
+    players[0].computerMove();
   };
 };
 
@@ -50,13 +51,39 @@ Player.prototype.checkIfWin = function() {
   });
 };
 
+Player.prototype.computerMove = function() {
+  const bestMoves = [4, 0, 2, 6, 8, 1, 3, 5, 7];
+
+  // possible moves (must contain available field)
+  // check how many fields from winning lists has the computer (playerMoves)
+  // sort them by current length (but it must contain free field)
+  // if true - make move on list with biggest number of computerMoves
+  
+  // possible human moves (must contain available field)
+  // check how many fields from winning lists has human (playerMoves)
+  // sort them by current length (but it must contain free field)
+  // if true - make move on list with biggest number of computermoves - don't allow to win
+
+  if (this.human === false) {
+    let guard = 0;
+    bestMoves.forEach(move => {
+      if (boardFields[move].classList.contains('board__field--unchecked') && guard === 0) {
+        setTimeout(function() {
+          boardFields[move].click()
+        }, computerMoveDelay(1, 3));
+        guard++;
+      };
+    });
+  };
+};
+
 function checkIfDraw() {
   let markedFields = boardFields.length;
 
   for (let i = 1; i < boardFields.length; i++) {
     if (!(boardFields[i].classList.contains('board__field--unchecked'))) {
       markedFields--;
-    }
+    };
   };
 
   if (markedFields === 1) {
@@ -66,6 +93,10 @@ function checkIfDraw() {
     };
   };
 };
+
+function computerMoveDelay(min, max) {
+  return Math.floor(Math.random() * (max - min) + min) * 1000;
+}
 
 function endGame() {
   boardFields.forEach(field => field.removeEventListener('click', players[0].makeMove));
@@ -82,8 +113,14 @@ const x = 'X';
 const y = 'O';
 
 const player1 = new Player(true, x);
-const player2 = new Player(true, y);
+const player2 = new Player(false, y);
 
 const players = [player1, player2];
 
 game();
+
+// add computer as a player - done
+// add an option to write a name of the player
+// add an option to keep and display scores
+// add an animation when sb wins
+// add an option to change theme
