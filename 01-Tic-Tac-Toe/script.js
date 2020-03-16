@@ -61,6 +61,8 @@ Player.prototype.computerMove = function() {
   const availableMoves = findAvailableMoves();
   const leftWinningMoves = []
 
+  let j = 0;
+
   if (this.human === false) {
     
     winningMoves.forEach(movesSequence => {
@@ -84,6 +86,32 @@ Player.prototype.computerMove = function() {
   };
 
   if (this.human === false) {
+    // let j = 0;
+    leftWinningMoves.forEach(movesData => {
+      if (movesData[0] <= 2 && j === 0) {
+        let i = 0;
+
+        if (j === 0) {
+          movesData[1].forEach(element => {
+          if (this.playerMoves.find(move => move === element)) {
+            i++;
+          };
+        })
+
+          if (i === 2) {
+            j++;
+
+            movesData[1].forEach(element => {
+              if (this.playerMoves.find(move => move !== element)) {
+                setTimeout(function() {
+                boardFields[element].click()
+                }, computerMoveDelay(1, 3));
+              };
+            })
+            console.log('dupa');
+          }
+      }}
+    })
     // get player(computer) moves - this will go as second move
     // compare with leftWinningMoves:
       // if movesSequence of leftWinningMoves doesn't contain any enemy move fulfill it
@@ -93,7 +121,7 @@ Player.prototype.computerMove = function() {
   // compare with leftWinningMoves
     // if the first element of movesSequence of leftWinningMoves === 1 and it contains 2 enemy moves - fulfill the last one to not allow opponent to win
 
-  if (this.human === false) { // this will go as the last option
+  if (this.human === false && j === 0) { // this will go as the last option
     let guard = 0;
     bestMoves.forEach(move => {
       if (boardFields[move].classList.contains('board__field--unchecked') && guard === 0) {
@@ -101,6 +129,7 @@ Player.prototype.computerMove = function() {
           boardFields[move].click()
         }, computerMoveDelay(1, 3));
         guard++;
+        console.log('dupa2');
       };
     });
   };
