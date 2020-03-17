@@ -30,7 +30,10 @@ Player.prototype.makeMove = function(e) {
     };
 
     players.reverse();
-    players[0].computerMove();
+
+    if (players[0].human === false) {
+      players[0].computerMove();
+    }
   };
 };
 
@@ -56,81 +59,103 @@ Player.prototype.checkIfWin = function() {
 };
 
 Player.prototype.computerMove = function() {
-
   const bestMoves = [4, 0, 2, 6, 8, 1, 3, 5, 7];
-  const availableMoves = findAvailableMoves();
-  const leftWinningMoves = []
+  const leftWinningMoves = waysToWin();
 
-  let j = 0;
+  let guard = 0;    
 
-  if (this.human === false) {
-    
-    winningMoves.forEach(movesSequence => {
-
-      let i = 0;
-      for (let possibleMove of movesSequence) {
-        for (let availableMove of availableMoves) {
-          if (possibleMove === availableMove) {
-            i++;
-          }
-        }
-      }
-
-      if (i > 0) {
-        leftWinningMoves.push([i, movesSequence]);      
+  if (this.human === false && guard === 0) {
+    const availableWays = leftWinningMoves
+      .filter(movesData => movesData[0] === 1)
+      .map(movesData => {
+        return movesData[1];
+      });
+    // add another if guard === 0
+    availableWays.forEach(element => {
+      let j = 0;
+      let availableElement;
+      for (let i = 0; i !== 3; i++) {
+        this.playerMoves.find(move => move === element[i]) ? j++ : availableElement = element[i];
+        if (this.playerMoves[0] === 0 && element[i] === 0) {
+          j++;
+        };
+      }; 
+      if (j === 2 && guard === 0 && availableElement !== undefined) {
+        console.log('Computer makes final winning move!');
+        boardFields[availableElement].click();
+        guard++;
       };
     });
-
-    leftWinningMoves.sort()
-    console.log(leftWinningMoves);
   };
 
-  if (this.human === false) {
-    // let j = 0;
-    leftWinningMoves.forEach(movesData => {
-      if (movesData[0] <= 2 && j === 0) {
-        let i = 0;
-
-        if (j === 0) {
-          movesData[1].forEach(element => {
-          if (this.playerMoves.find(move => move === element)) {
-            i++;
-          };
-        })
-
-          if (i === 2) {
-            j++;
-
-            movesData[1].forEach(element => {
-              if (this.playerMoves.find(move => move !== element)) {
-                setTimeout(function() {
-                boardFields[element].click()
-                }, computerMoveDelay(1, 3));
-              };
-            })
-            console.log('dupa');
-          }
-      }}
-    })
-    // get player(computer) moves - this will go as second move
-    // compare with leftWinningMoves:
-      // if movesSequence of leftWinningMoves doesn't contain any enemy move fulfill it
-  };
-
-  // get human moves - this will go as first move
-  // compare with leftWinningMoves
-    // if the first element of movesSequence of leftWinningMoves === 1 and it contains 2 enemy moves - fulfill the last one to not allow opponent to win
-
-  if (this.human === false && j === 0) { // this will go as the last option
-    let guard = 0;
-    bestMoves.forEach(move => {
-      if (boardFields[move].classList.contains('board__field--unchecked') && guard === 0) {
-        setTimeout(function() {
-          boardFields[move].click()
-        }, computerMoveDelay(1, 3));
+  if (this.human === false && guard === 0) {
+    const availableWays = leftWinningMoves
+      .filter(movesData => movesData[0] === 1)
+      .map(movesData => {
+        return movesData[1];
+      });
+      // add another if guard === 0
+    availableWays.forEach(element => {
+      let j = 0;
+      let availableElement;
+      for (let i = 0; i !== 3; i++) {
+        players[1].playerMoves.find(move => move === element[i]) ? j++ : availableElement = element[i];
+        if (players[1].playerMoves[0] === 0 && element[i] === 0) {
+          j++;
+        };
+      }; 
+      if (j === 2 && guard === 0 && availableElement !== undefined) {
+        console.log('Computer makes move to don\'t allow the opponent to win!');
+        boardFields[availableElement].click();
         guard++;
-        console.log('dupa2');
       };
+    });
+  };
+
+  if (this.human === false && guard === 0) {
+    const availableWays = leftWinningMoves
+      .filter(movesData => movesData[0] === 2)
+      .map(movesData => {
+        return movesData[1];
+      });
+    // add another if guard === 0
+    availableWays.forEach(element => {
+      let j = 0;
+      let availableElement;
+      for (let i = 0; i !== 3; i++) {
+        this.playerMoves.find(move => move === element[i]) ? j++ : availableElement = element[i];
+        if (this.playerMoves[0] === 0 && element[i] === 0) {
+          j++;
+        };
+      }; 
+      if (j === 1 && guard === 0 && availableElement !== undefined) {
+        console.log('Computer makes move!');
+        boardFields[availableElement].click();
+        guard++;
+      };
+    });
+  };
+  
+
+  if (this.human === false && guard === 0) {
+    const availableWays = leftWinningMoves
+      .filter(movesData => movesData[0] === 3)
+      .map(movesData => {
+        return movesData[1];
+      });
+    
+      // add another if guard === 0
+      availableWays.forEach(element => {
+        let i = 0;
+        let availableElement;
+      element.forEach(availableMove => {
+        (bestMoves.find(move => move === availableMove)) ? availableElement = availableMove : i++;
+        if (guard === 0 && availableElement !== undefined) {
+          console.log('Computer makes move from bestMoves()!');
+          boardFields[availableElement].click();
+          guard++;
+        };
+      });
     });
   };
 };
@@ -166,6 +191,26 @@ function findAvailableMoves() {
   return availableMoves;
 };
 
+function waysToWin() {
+  const availableMoves = findAvailableMoves();
+  const leftWinningMoves = []
+
+  winningMoves.forEach(movesSequence => {
+    let i = 0;
+    for (let possibleMove of movesSequence) {
+      for (let availableMove of availableMoves) {
+        (possibleMove === availableMove) ? i++ : i;
+      }
+    }
+
+    (i > 0) ? leftWinningMoves.push([i, movesSequence]) : i = 0;
+  })
+
+  leftWinningMoves.sort();
+  return leftWinningMoves;
+};
+
+
 function endGame() {
   boardFields.forEach(field => field.removeEventListener('click', players[0].makeMove));
   boardFields.forEach(field => field.removeEventListener('click', checkIfDraw));
@@ -187,8 +232,12 @@ const players = [player1, player2];
 
 game();
 
-// add computer as a player
-// add an option to write a name of the player
-// add an option to keep and display scores
-// add an animation when sb wins
+// add computer as a player - almost done! (pack everything in one function!)
+
 // add an option to change theme
+
+// add an animation when sb wins
+
+// add an option to keep and display scores
+
+// add an option to write a name of the player
