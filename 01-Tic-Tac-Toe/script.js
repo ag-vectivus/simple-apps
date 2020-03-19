@@ -1,5 +1,6 @@
 const boardFields = document.querySelectorAll('.board__field');
 
+const bestMoves = [4, 0, 2, 6, 8, 1, 3, 5, 7];
 const winningMoves = [[0, 1, 2], 
                       [3, 4, 5], 
                       [6, 7, 8], 
@@ -66,7 +67,7 @@ Player.prototype.computerMove = function() {
   (guard === 0) ? guard = computerDecide(guard, 2, this.playerMoves, 1, 'Computer makes move!') : guard;
   (guard === 0) ? guard = modyfiedComputerDecide(guard, 'Computer makes move from bestMoves!') : guard;
 
-  if (this.mark === x && guard === 0) {
+  if (guard === 0) {
     for (let i = 1; i < boardFields.length; i++) {
       if ((boardFields[i].classList.contains('board__field--unchecked'))) {
         boardFields[i].click();
@@ -119,26 +120,28 @@ function computerDecide(guard, fieldsLeft, movesMade, movesOfPlayer, message) {
 };
 
 function modyfiedComputerDecide(guard, message) {
-  const bestMoves = [4, 0, 2, 6, 8, 1, 3, 5, 7];
   const leftWinningMoves = waysToWin();
   const availableWays = leftWinningMoves
     .filter(movesData => movesData[0] === 3)
     .map(movesData => {
       return movesData[1];
     });
-    
-  availableWays.forEach(element => {
-    let i = 0;
-    let availableElement;
-    element.forEach(availableMove => {
-      (bestMoves.find(move => move === availableMove)) ? availableElement = availableMove : i++;
-      if (guard === 0 && availableElement !== undefined) {
+
+  function availableElement() {
+    for (let i = 0; i < bestMoves.length; i++) {
+      let availableMove = availableWays
+        .flat(1)
+        .find(move => move === bestMoves[i]);
+      if (guard === 0 && availableMove !== undefined) {
         console.log(message);
-        boardFields[availableElement].click();
+        boardFields[availableMove].click();
         guard++;
       };
-    });
-  });
+    };
+    return guard;
+  };
+  
+  guard = availableElement();
   return guard;
 };
 
@@ -193,15 +196,12 @@ function game() {
 const x = 'X';
 const y = 'O';
 
-const player1 = new Player(false, x);
-const player2 = new Player(true, y);
+const player1 = new Player(true, x);
+const player2 = new Player(false, y);
 
 const players = [player1, player2];
 
 game();
-
-// add setTimeout to delay computer move
-// fix bug - when X is the computer it doesn't make the last move (if it's not winning move)
 
 // add an option to change player
 
