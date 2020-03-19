@@ -1,4 +1,5 @@
 const boardFields = document.querySelectorAll('.board__field');
+const settingButtons = document.querySelectorAll('.settings__menu');
 
 const bestMoves = [4, 0, 2, 6, 8, 1, 3, 5, 7];
 const winningMoves = [[0, 1, 2], 
@@ -174,8 +175,8 @@ function waysToWin() {
   return leftWinningMoves;
 };
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+function sleep(delay) {
+  return new Promise(resolve => setTimeout(resolve, delay));
 };
 
 function endGame() {
@@ -194,16 +195,39 @@ function game() {
 };
 
 const x = 'X';
-const y = 'O';
+const o = 'O';
 
 const player1 = new Player(true, x);
-const player2 = new Player(false, y);
+const player2 = new Player(false, o);
 
 const players = [player1, player2];
 
-game();
+settingButtons.forEach(button => button.addEventListener('click', changePlayer));
 
-// add an option to change player
+function changePlayer(e) {
+  this.classList.toggle('js-human');
+  this.classList.toggle('js-computer');
+  if (this.classList.contains('js-player-x')) {
+    if (this.classList.contains('js-human')) {
+      this.textContent='X: Human';
+      player1.human = true;
+    } else {
+      this.textContent='X: Computer';
+      player1.human = false;
+    }
+  } else {
+    if (this.classList.contains('js-human')) {
+      this.textContent='O: Human';
+      player2.human = true;
+    } else {
+      this.textContent='X: Computer';
+      player2.human = false;
+    };
+  };
+  game();
+};
+
+game();
 
 // add an option to change theme
 // add an animation when sb wins
