@@ -32,8 +32,8 @@ Player.prototype.makeMove = function(e) {
     players.reverse();
 
     if (players[0].human === false) {
-      players[0].computerMove();
-    }
+      sleep(1000).then(() => { players[0].computerMove(); });
+    };
   };
 };
 
@@ -61,20 +61,17 @@ Player.prototype.checkIfWin = function() {
 Player.prototype.computerMove = function() {
   let guard = 0;
 
-  if (guard === 0) {
-    guard = computerDecide(guard, 1, this.playerMoves, 2, 'Computer makes final winning move!');
-  };
+  (guard === 0) ? guard = computerDecide(guard, 1, this.playerMoves, 2, 'Computer makes final winning move!') : guard;
+  (guard === 0) ? guard = computerDecide(guard, 1, players[1].playerMoves, 2, 'Computer makes move to don\'t allow the opponent to win!') : guard;
+  (guard === 0) ? guard = computerDecide(guard, 2, this.playerMoves, 1, 'Computer makes move!') : guard;
+  (guard === 0) ? guard = modyfiedComputerDecide(guard, 'Computer makes move from bestMoves!') : guard;
 
-  if (guard === 0) {
-    guard = computerDecide(guard, 1, players[1].playerMoves, 2, 'Computer makes move to don\'t allow the opponent to win!');
-  };
-
-  if (guard === 0) {
-    guard = computerDecide(guard, 2, this.playerMoves, 1, 'Computer makes move!');
-  };
-
-  if (guard === 0) {
-    guard = modyfiedComputerDecide(guard, 'Computer makes move from bestMoves!');
+  if (this.mark === x && guard === 0) {
+    for (let i = 1; i < boardFields.length; i++) {
+      if ((boardFields[i].classList.contains('board__field--unchecked'))) {
+        boardFields[i].click();
+      };
+    };
   };
 };
 
@@ -94,10 +91,6 @@ function checkIfDraw() {
     };
   };
 };
-
-function computerMoveDelay(min, max) {
-  return Math.floor(Math.random() * (max - min) + min) * 1000;
-}
 
 function computerDecide(guard, fieldsLeft, movesMade, movesOfPlayer, message) {
   const leftWinningMoves = waysToWin();
@@ -168,14 +161,18 @@ function waysToWin() {
     for (let possibleMove of movesSequence) {
       for (let availableMove of availableMoves) {
         (possibleMove === availableMove) ? i++ : i;
-      }
-    }
+      };
+    };
 
     (i > 0) ? leftWinningMoves.push([i, movesSequence]) : i = 0;
-  })
+  });
 
   leftWinningMoves.sort();
   return leftWinningMoves;
+};
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 };
 
 function endGame() {
@@ -196,14 +193,16 @@ function game() {
 const x = 'X';
 const y = 'O';
 
-const player1 = new Player(true, x);
-const player2 = new Player(false, y);
+const player1 = new Player(false, x);
+const player2 = new Player(true, y);
 
 const players = [player1, player2];
 
 game();
 
+// add setTimeout to delay computer move
 // fix bug - when X is the computer it doesn't make the last move (if it's not winning move)
+
 // add an option to change player
 
 // add an option to change theme
