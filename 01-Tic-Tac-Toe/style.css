@@ -31,7 +31,7 @@ body {
 
 .title {
   max-width: 350px;
-  margin: 100px auto;
+  margin: 3rem auto;
   text-align: center;
   font-size: 5.4rem;
   color: var(--secondary-color);
@@ -42,7 +42,7 @@ body {
 
 .wrapper {
   max-width: 350px;
-  margin: 100px auto;
+  margin: 3rem auto;
 }
 
 .board {
@@ -71,7 +71,7 @@ body {
 
 .buttons-wrapper {
   max-width: 22rem;
-  margin: 7rem auto;
+  margin: 3rem auto;
 }
 
 .settings {
