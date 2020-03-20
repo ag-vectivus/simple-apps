@@ -1,5 +1,6 @@
 const boardFields = document.querySelectorAll('.board__field');
-const settingButtons = document.querySelectorAll('.settings__menu');
+const startButton = document.querySelector('.settings__menu--start');
+const settingButtons = document.querySelectorAll('.settings__player');
 
 const bestMoves = [4, 0, 2, 6, 8, 1, 3, 5, 7];
 const winningMoves = [[0, 1, 2], 
@@ -54,7 +55,7 @@ Player.prototype.checkIfWin = function() {
       endGame();
 
       if (window.confirm(`${this.mark} is the winner! \nDo you want to play again?`)) {
-        window.location.reload();
+        resetGame();
       };
     };
   });
@@ -89,7 +90,7 @@ function checkIfDraw() {
   if (markedFields === 1) {
     endGame();
     if (window.confirm(`It's a draw! \nDo you want to play again?`)) {
-      window.location.reload();
+      resetGame();
     };
   };
 };
@@ -185,6 +186,16 @@ function endGame() {
   boardFields.forEach(field => field.classList.remove('board__field--unchecked'));
 };
 
+function resetGame() {
+  endGame();
+  player1.playerMoves = [];
+  player2.playerMoves = [];
+  boardFields.forEach(field => field.textContent='');
+  boardFields.forEach(field => field.classList.add('board__field--unchecked'));
+  players[0] = player1;
+  players[1] = player2;
+};
+
 function game() {
   boardFields.forEach(field => field.addEventListener('click', players[0].makeMove));
   boardFields.forEach(field => field.addEventListener('click', checkIfDraw));
@@ -203,8 +214,10 @@ const player2 = new Player(false, o);
 const players = [player1, player2];
 
 settingButtons.forEach(button => button.addEventListener('click', changePlayer));
+startButton.addEventListener('click', game);
 
 function changePlayer(e) {
+  resetGame();
   this.classList.toggle('js-human');
   this.classList.toggle('js-computer');
   if (this.classList.contains('js-player-x')) {
@@ -224,13 +237,8 @@ function changePlayer(e) {
       player2.human = false;
     };
   };
-  game();
 };
 
-game();
+// set computer game to be more random
 
-// add an option to change theme
 // add an animation when sb wins
-
-// add an option to keep and display scores
-// add an option to write a name of the player
