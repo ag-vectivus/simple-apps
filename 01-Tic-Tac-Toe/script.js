@@ -1,17 +1,20 @@
+// || Catch DOM Elements
 const boardFields = document.querySelectorAll('.board__field');
 const startButton = document.querySelector('.settings__menu--start');
 const settingButtons = document.querySelectorAll('.settings__player');
 
-const bestMoves = [4, 0, 2, 6, 8, 1, 3, 5, 7];
-const winningMoves = [[0, 1, 2], 
-                      [3, 4, 5], 
-                      [6, 7, 8], 
-                      [0, 3, 6], 
-                      [1, 4, 7], 
-                      [2, 5, 8], 
-                      [0, 4, 8], 
-                      [2, 4, 6]];
+// || DOM manipulation settings
+const colorToChange = 'rgb(255, 235, 210)';
 
+// || Moves sequences
+const bestMoves = [4, 0, 2, 6, 8, 1, 3, 5, 7];
+const winningMoves = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
+
+// || Initial global variables
+const x = 'X';
+const o = 'O';
+
+// || Player object
 const Player = function(human, mark, playerMoves = []) {
   this.human = human;
   this.mark = mark;
@@ -24,6 +27,7 @@ Player.prototype.makeMove = function(e) {
     e.target.textContent = players[0].mark;
     e.target.style.setProperty('scale', '1');
     e.target.classList.remove('board__field--unchecked');
+    startButton.textContent="reset";
 
     players[0].playerMoves.push(Number(this.getAttribute('data-number')));
     players[0].playerMoves.sort();
@@ -45,18 +49,13 @@ Player.prototype.checkIfWin = function() {
   winningMoves.forEach(movesSequence => {
     let i = 0;
     movesSequence.forEach(move => {
-
-      if (this.playerMoves.includes(move)) {
-        i++;
-      }
+      this.playerMoves.includes(move) ? i++ : i;
     });
 
     if (i === 3) {
+      movesSequence.forEach(move => boardFields[move].style.setProperty('color', colorToChange));
+      startButton.style.setProperty('color', colorToChange);
       endGame();
-
-      if (window.confirm(`${this.mark} is the winner! \nDo you want to play again?`)) {
-        resetGame();
-      };
     };
   });
 };
@@ -78,23 +77,7 @@ Player.prototype.computerMove = function() {
   };
 };
 
-function checkIfDraw() {
-  let markedFields = boardFields.length;
-
-  for (let i = 1; i < boardFields.length; i++) {
-    if (!(boardFields[i].classList.contains('board__field--unchecked'))) {
-      markedFields--;
-    };
-  };
-
-  if (markedFields === 1) {
-    endGame();
-    if (window.confirm(`It's a draw! \nDo you want to play again?`)) {
-      resetGame();
-    };
-  };
-};
-
+// || Functions - computer move
 function computerDecide(guard, fieldsLeft, movesMade, movesOfPlayer, message) {
   const leftWinningMoves = waysToWin();
   const availableWays = leftWinningMoves
@@ -122,6 +105,7 @@ function computerDecide(guard, fieldsLeft, movesMade, movesOfPlayer, message) {
 };
 
 function modyfiedComputerDecide(guard, message) {
+  const modyfiedBestMoves = bestMoves.slice(randomNumber(0, 2));
   const leftWinningMoves = waysToWin();
   const availableWays = leftWinningMoves
     .filter(movesData => movesData[0] === 3)
@@ -130,10 +114,10 @@ function modyfiedComputerDecide(guard, message) {
     });
 
   function availableElement() {
-    for (let i = 0; i < bestMoves.length; i++) {
+    for (let i = 0; i < modyfiedBestMoves.length; i++) {
       let availableMove = availableWays
         .flat(1)
-        .find(move => move === bestMoves[i]);
+        .find(move => move === modyfiedBestMoves[i]);
       if (guard === 0 && availableMove !== undefined) {
         console.log(message);
         boardFields[availableMove].click();
@@ -147,6 +131,23 @@ function modyfiedComputerDecide(guard, message) {
   return guard;
 };
 
+// || Function - check if there is a draw
+function checkIfDraw() {
+  let markedFields = boardFields.length;
+
+  for (let i = 1; i < boardFields.length; i++) {
+    if (!(boardFields[i].classList.contains('board__field--unchecked'))) {
+      markedFields--;
+    };
+  };
+
+  if (markedFields === 1) {
+    endGame();
+    startButton.style.setProperty('color', colorToChange);
+  };
+};
+
+// || Functions - find available ways to win
 function findAvailableMoves() {
   const availableMoves = [];
   boardFields.forEach(field => {
@@ -176,69 +177,90 @@ function waysToWin() {
   return leftWinningMoves;
 };
 
+// || Service functions
 function sleep(delay) {
   return new Promise(resolve => setTimeout(resolve, delay));
 };
 
-function endGame() {
-  boardFields.forEach(field => field.removeEventListener('click', players[0].makeMove));
-  boardFields.forEach(field => field.removeEventListener('click', checkIfDraw));
-  boardFields.forEach(field => field.classList.remove('board__field--unchecked'));
+function randomNumber(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-function resetGame() {
-  endGame();
-  player1.playerMoves = [];
-  player2.playerMoves = [];
-  boardFields.forEach(field => field.textContent='');
-  boardFields.forEach(field => field.classList.add('board__field--unchecked'));
+// || Player settings function
+function changePlayer(e) {
+  resetGame();
+  e.target.classList.toggle('js-human');
+  e.target.classList.toggle('js-computer');
+  if (e.target.classList.contains('js-player-x')) {
+    if (e.target.classList.contains('js-human')) {
+      e.target.textContent='X: Human';
+      player1.human = true;
+    } else {
+      e.target.textContent='X: Computer';
+      player1.human = false;
+    }
+  } else {
+    if (e.target.classList.contains('js-human')) {
+      e.target.textContent='O: Human';
+      player2.human = true;
+    } else {
+      e.target.textContent='O: Computer';
+      player2.human = false;
+    };
+  };
+  if (player1.human === true) {
+    game();
+  };
+};
+
+// || Game functions
+function game() {
+  resetGame();
   players[0] = player1;
   players[1] = player2;
-};
+  boardFields.forEach(field => {
+    field.addEventListener('click', players[0].makeMove);
+    field.addEventListener('click', checkIfDraw);
+  });
 
-function game() {
-  boardFields.forEach(field => field.addEventListener('click', players[0].makeMove));
-  boardFields.forEach(field => field.addEventListener('click', checkIfDraw));
-  
   if (players[0].human === false) {
     players[0].computerMove();
   };
 };
 
-const x = 'X';
-const o = 'O';
+function resetGame() {
+  endGame();
+  players.forEach(player => player.playerMoves = []);
+  
+  startButton.textContent="start";
+  startButton.style.removeProperty('color');
 
-const player1 = new Player(true, x);
-const player2 = new Player(false, o);
+  boardFields.forEach(field => {
+    field.textContent='';
+    field.style.removeProperty('scale');
+    field.style.removeProperty('color');
+    field.classList.add('board__field--unchecked');
+  });
+};
 
-const players = [player1, player2];
+function endGame() {
+  boardFields.forEach(field => {
+    field.removeEventListener('click', players[0].makeMove);
+    field.removeEventListener('click', checkIfDraw);
+    field.classList.remove('board__field--unchecked');
+  });
+};
 
+// || Start game when the page is loaded
 settingButtons.forEach(button => button.addEventListener('click', changePlayer));
 startButton.addEventListener('click', game);
 
-function changePlayer(e) {
-  resetGame();
-  this.classList.toggle('js-human');
-  this.classList.toggle('js-computer');
-  if (this.classList.contains('js-player-x')) {
-    if (this.classList.contains('js-human')) {
-      this.textContent='X: Human';
-      player1.human = true;
-    } else {
-      this.textContent='X: Computer';
-      player1.human = false;
-    }
-  } else {
-    if (this.classList.contains('js-human')) {
-      this.textContent='O: Human';
-      player2.human = true;
-    } else {
-      this.textContent='X: Computer';
-      player2.human = false;
-    };
-  };
+const player1 = new Player(true, x);
+const player2 = new Player(false, o);
+const players = [player1, player2];
+
+if (player1.human === true) {
+  game();
 };
-
-// set computer game to be more random
-
-// add an animation when sb wins
